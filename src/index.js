@@ -1,25 +1,26 @@
-const { DISCORD_TOKEN: token, prefix } = require('../config.json');
+const fs = require('fs');
+const path = require('path');
+const { DISCORD_TOKEN: token } = require('../config.json');
 const { Client, Intents, Collection } = require('discord.js');
 const client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
 
-client.on('ready', () => {
-	console.log(`Login as ${client.user.tag}`);
+client.commands = new Collection();
+
+// Commands
+commands = fs.readdirSync(path.join(__dirname, 'commands/'));
+
+commands.map((file) => {
+	const cmd = require(path.join(__dirname, 'commands', file));
+	client.commands.set(cmd.name, cmd);
 });
 
-client.on('messageCreate', async (message) => {
-	if (message.author.bot) return;
-	if (!message.content.startsWith(prefix)) return;
-	let [cmdname, ...cmdargs] = message.content
-		.slice(prefix.length)
-		.trim()
-		.split(/\s+/);
-
-	if (cmdname === 'ping') {
-		console.log(cmdargs);
-		await message.channel.send('Pong!');
-	}
+// Events
+events = fs.readdirSync(path.join(__dirname, 'events'));
+events.map((file) => {
+	const event = require(path.join(__dirname, 'events', file));
+	client.on(event.name, (...args) => event.run(client, ...args));
 });
 
 client.login(token);
