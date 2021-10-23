@@ -44,10 +44,17 @@ const tts = (msg) => {
 		adapterCreator: msg.guild.voiceAdapterCreator,
 	});
 
-	gtts.save(file, (err, result) => {
-		if (err) throw new Error(err);
-		const resource = createAudioResource(file);
-		player.play(resource);
-		connection.subscribe(player);
-	});
+	console.log(
+		`[${msg.author.username}#${msg.author.discriminator}] ${msg.content}`
+	);
+	const resource = createAudioResource(gtts.stream());
+	player.play(resource);
+	connection.subscribe(player);
+
+	// gtts.save(file, (err, result) => {
+	// 	if (err) throw new Error(err);
+	// 	const resource = createAudioResource(file);
+	// 	player.play(resource);
+	// 	connection.subscribe(player);
+	// });
 };
