@@ -1,4 +1,3 @@
-const { join } = require('path');
 const { prefix } = require('../../config.json');
 const Gtts = require('gtts');
 const {
@@ -16,7 +15,8 @@ module.exports = {
 		if (message.content.startsWith('.')) {
 			if (!message.member.voice.channel)
 				return message.channel.send('Ingresa a un canal de voz');
-			tts(message);
+
+			tts(client, message);
 			return;
 		}
 		if (!message.content.startsWith(prefix)) return;
@@ -32,9 +32,8 @@ module.exports = {
 	},
 };
 
-const tts = (msg) => {
-	let gtts = new Gtts(msg.content, 'es');
-	const file = join(__dirname, '../../tts.mp3');
+const tts = (client, msg) => {
+	let gtts = new Gtts(msg.content.substr(1), 'es');
 	const channel = msg.member.voice.channel;
 	const player = createAudioPlayer();
 
@@ -44,17 +43,14 @@ const tts = (msg) => {
 		adapterCreator: msg.guild.voiceAdapterCreator,
 	});
 
+	client.customConnection = connection;
+
 	console.log(
-		`[${msg.author.username}#${msg.author.discriminator}] ${msg.content}`
+		`[${msg.author.username}#${msg.author.discriminator}] ${msg.content.substr(
+			1
+		)}`
 	);
 	const resource = createAudioResource(gtts.stream());
 	player.play(resource);
 	connection.subscribe(player);
-
-	// gtts.save(file, (err, result) => {
-	// 	if (err) throw new Error(err);
-	// 	const resource = createAudioResource(file);
-	// 	player.play(resource);
-	// 	connection.subscribe(player);
-	// });
 };
