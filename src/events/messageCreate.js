@@ -33,7 +33,8 @@ module.exports = {
 };
 
 const tts = (client, msg) => {
-	let gtts = new Gtts(msg.content.substr(1), 'es');
+	let message = msg.content.slice(1).trim();
+	let gtts = new Gtts(message, 'es');
 	const channel = msg.member.voice.channel;
 	const player = createAudioPlayer();
 
@@ -46,9 +47,7 @@ const tts = (client, msg) => {
 	client.customConnection = connection;
 
 	console.log(
-		`[${msg.author.username}#${msg.author.discriminator}] ${msg.content.substr(
-			1
-		)}`
+		`[${msg.author.username}#${msg.author.discriminator}] ${message}`
 	);
 	const resource = createAudioResource(gtts.stream());
 	player.play(resource);
