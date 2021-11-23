@@ -11,6 +11,16 @@ module.exports = {
 		let random = Math.floor(Math.random() * args.length);
 		if (args.length === 0)
 			return message.channel.send('Debes ingresar al menos una opción');
-		message.channel.send(`Ganador!: ${random + 1} ${args[random]}`);
+
+		message.channel.send({
+			embeds: [
+				{
+					title: 'Ganador',
+					type: 'rich',
+					description: args[random],
+					color: 10181046,
+				},
+			],
+		});
 	},
 };
