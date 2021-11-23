@@ -25,7 +25,11 @@ module.exports = {
 			.trim()
 			.split(/\s+/);
 
-		const cmd = client.commands.get(cmdname);
+		const cmd =
+			client.commands.get(cmdname) ||
+			client.commands.find(
+				(cmd) => cmd.aliases && cmd.aliases.includes(cmdname)
+			);
 
 		if (!cmd) return;
 		cmd.run(client, message, cmdargs);
