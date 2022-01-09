@@ -7,3 +7,4 @@
 - dotenv
 - discord.js
 - gtts
+- ibm-watson
