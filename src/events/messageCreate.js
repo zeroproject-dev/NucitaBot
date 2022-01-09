@@ -24,7 +24,7 @@ module.exports = {
 		if (!message.content.startsWith(process.env.COMMAND_PREFIX)) return;
 
 		let [cmdname, ...cmdargs] = message.content
-			.slice(prefix.length)
+			.slice(process.env.COMMAND_PREFIX.length)
 			.trim()
 			.split(/\s+/);
 
