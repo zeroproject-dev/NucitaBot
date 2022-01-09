@@ -1,6 +1,6 @@
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const { token } = require('./utils/config');
 const { Client, Intents, Collection } = require('discord.js');
 
 const client = new Client({
@@ -28,4 +28,4 @@ events.map((file) => {
 	client.on(event.name, (...args) => event.run(client, ...args));
 });
 
-client.login(token);
+client.login(process.env.DISCORD_TOKEN);
