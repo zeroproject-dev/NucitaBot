@@ -1,20 +1,13 @@
 require('dotenv').config();
 const Gtts = require('gtts');
-const TextToSpeechV1 = require('ibm-watson/text-to-speech/v1');
-const { IamAuthenticator } = require('ibm-watson/auth');
+const sdk = require('microsoft-cognitiveservices-speech-sdk');
+const { PassThrough } = require('stream');
 
 const {
 	joinVoiceChannel,
 	createAudioPlayer,
 	createAudioResource,
 } = require('@discordjs/voice');
-
-const wTts = new TextToSpeechV1({
-	authenticator: new IamAuthenticator({
-		apikey: process.env.WATSON_API_KEY,
-	}),
-	serviceUrl: process.env.WATSON_URL_TTS,
-});
 
 const famele = (client, msg, options = { lang: 'es' }) => {
 	const {
@@ -51,8 +44,8 @@ const male = (
 	client,
 	msg,
 	options = {
-		typeAccept: 'audio/ogg;codecs=opus',
-		voice: 'es-ES_EnriqueV3Voice',
+		lang: 'es-BO',
+		voice: 'es-BO-MarceloNeural',
 	}
 ) => {
 	const {
@@ -77,21 +70,32 @@ const male = (
 	client.customConnection = connection;
 
 	console.log(`[${author.username}#${author.discriminator}] ${text}`);
+	const speechConfig = sdk.SpeechConfig.fromSubscription(
+		process.env.AZURE_API_KEY_TTS,
+		process.env.AZURE_REGION_TTS
+	);
 
-	wTts
-		.synthesize({
-			text: text,
-			accept: options.typeAccept,
-			voice: options.voice,
-		})
-		.then((buffer) => {
-			const resource = createAudioResource(buffer.result);
+	speechConfig.speechSynthesisLanguage = options.lang;
+	speechConfig.speechSynthesisVoiceName = options.voice;
+
+	const synthesizer = new sdk.SpeechSynthesizer(speechConfig);
+
+	synthesizer.speakTextAsync(
+		text,
+		(result) => {
+			const { audioData } = result;
+			synthesizer.close();
+			const bufferStream = new PassThrough();
+			bufferStream.end(Buffer.from(audioData));
+			const resource = createAudioResource(bufferStream);
 			player.play(resource);
 			connection.subscribe(player);
-		})
-		.catch((err) => {
-			console.log('error:', err);
-		});
+		},
+		(error) => {
+			console.log(error);
+			synthesizer.close();
+		}
+	);
 };
 
 module.exports = { famele, male };
