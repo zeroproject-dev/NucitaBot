@@ -7,4 +7,4 @@
 - dotenv
 - discord.js
 - gtts
-- ibm-watson
+- Azure TTS

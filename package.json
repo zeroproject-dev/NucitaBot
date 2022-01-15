@@ -6,6 +6,7 @@
 		"ffmpeg-static": "^4.4.0",
 		"gtts": "^0.2.1",
 		"libsodium-wrappers": "^0.7.9",
+		"microsoft-cognitiveservices-speech-sdk": "^1.19.0",
 		"opusscript": "^0.0.8"
 	},
 	"name": "nucitabot",
