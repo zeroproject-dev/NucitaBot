@@ -1,4 +1,4 @@
-require('dotenv').config();
+const { AZURE_API_KEY_TTS, AZURE_REGION_TTS } = require('./config');
 const Gtts = require('gtts');
 const sdk = require('microsoft-cognitiveservices-speech-sdk');
 const { PassThrough } = require('stream');
@@ -71,8 +71,8 @@ const male = (
 
 	console.log(`[${author.username}#${author.discriminator}] ${text}`);
 	const speechConfig = sdk.SpeechConfig.fromSubscription(
-		process.env.AZURE_API_KEY_TTS,
-		process.env.AZURE_REGION_TTS
+		AZURE_API_KEY_TTS,
+		AZURE_REGION_TTS
 	);
 
 	speechConfig.speechSynthesisLanguage = options.lang;

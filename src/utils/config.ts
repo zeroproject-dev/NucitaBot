@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-config = {
+const config = {
 	DISCORD_TOKEN: process.env.DISCORD_TOKEN,
 	COMMAND_PREFIX: process.env.COMMAND_PREFIX,
 	VOICE_FEMALE_PREFIX: process.env.VOICE_FEMALE_PREFIX,

@@ -4,6 +4,7 @@
 		"discord.js": "^13.1.0",
 		"dotenv": "^10.0.0",
 		"ffmpeg-static": "^4.4.0",
+		"glob": "^7.2.0",
 		"gtts": "^0.2.1",
 		"libsodium-wrappers": "^0.7.9",
 		"microsoft-cognitiveservices-speech-sdk": "^1.19.0",
@@ -15,12 +16,21 @@
 	"main": "src/index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "nodemon src/index.js"
+		"dev": "nodemon dist/index.js",
+		"start": "ts-node src/index.ts",
+		"start:dev": "ts-node-dev src/index.ts",
+		"start:prod": "node dist/index.js",
+		"build": "tsc",
+		"watch": "tsc -w"
 	},
 	"author": "zeroproject (Andres Copeticona)",
 	"license": "ISC",
 	"devDependencies": {
+		"@types/glob": "^7.2.0",
+		"@types/node": "^17.0.10",
 		"eslint": "^7.32.0",
-		"nodemon": "^2.0.13"
+		"nodemon": "^2.0.13",
+		"ts-node-dev": "^1.1.8",
+		"typescript": "^4.5.5"
 	}
 }
