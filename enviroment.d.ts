@@ -7,6 +7,7 @@ declare global {
 			VOICE_MALE_PREFIX: string;
 			AZURE_API_KEY_TTS: string;
 			AZURE_REGION_TTS: string;
+			DISCORD_GUILDID: string;
 			ENVIROMENT: 'dev' | 'prod' | 'debug';
 		}
 	}

@@ -1,10 +1,10 @@
 import { RegisterCommandsOptions } from '../typings/Client';
 import {
-	ApplicationCommandData,
 	Client,
 	Collection,
 	ClientEvents,
 	Intents,
+	ApplicationCommandDataResolvable,
 } from 'discord.js';
 import { CommandType } from '../typings/Command';
 import { glob } from 'glob';
@@ -28,7 +28,6 @@ export class ExtendedClient extends Client {
 
 	start() {
 		this.registerModules();
-		console.log(process.env.DISCORD_TOKEN);
 		this.login(process.env.DISCORD_TOKEN);
 	}
 
@@ -44,26 +43,33 @@ export class ExtendedClient extends Client {
 			);
 		} else {
 			this.application?.commands.set(commands);
-			console.log('Registering global commands');
+			console.log(`Registering ${commands.length} global commands`);
 		}
 	}
 
 	async registerModules() {
 		// Commands
-		const slashCommands: ApplicationCommandData[] = [];
+		const slashCommands: ApplicationCommandDataResolvable[] = [];
 		const commandFiles = await globPromise(
 			`${__dirname}/../commands/*{.ts,.js}`
 		);
 		commandFiles.forEach(async (filePath: string) => {
 			const command: CommandType = await this.importFile(filePath);
 			if (!command.name) return;
-			console.log(command);
+
 			this.commands.set(command.name, command);
 			slashCommands.push(command);
 		});
 
+		// this.on('ready', () => {
+		this.registerCommands({
+			commands: slashCommands,
+			// guildId: process.env.DISCORD_GUILDID,
+		});
+		// });
+
 		// Events
-		const eventFiles = await globPromise(`${__dirname}/../commands/*{.ts,.js}`);
+		const eventFiles = await globPromise(`${__dirname}/../events/*{.ts,.js}`);
 
 		eventFiles.forEach(async (filePath: string) => {
 			const event: Event<keyof ClientEvents> = await this.importFile(filePath);
