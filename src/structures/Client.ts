@@ -1,32 +1,24 @@
-import { RegisterCommandsOptions } from '../typings/Client';
-import {
-	Client,
-	Collection,
-	ClientEvents,
-	Intents,
-	ApplicationCommandDataResolvable,
-} from 'discord.js';
-import { CommandType } from '../typings/Command';
+import { RegisterCommandsOptions } from '../Interfaces/IClient';
+import { Client, ClientOptions, Collection, Intents } from 'discord.js';
 import { glob } from 'glob';
 import { promisify } from 'util';
-import { Event } from './Event';
+import { ICommand } from '../Interfaces/ICommand';
+import { IEvent } from '../Interfaces/IEvent';
+import { VoiceConnection } from '@discordjs/voice';
 
 const globPromise = promisify(glob);
 
 export class ExtendedClient extends Client {
-	commands: Collection<string, CommandType> = new Collection();
+	commands: Collection<string, ICommand> = new Collection();
+	events: Collection<string, IEvent> = new Collection();
+	aliases: Collection<string, ICommand> = new Collection();
+	voiceConnection: VoiceConnection;
 
-	constructor() {
-		super({
-			intents: [
-				Intents.FLAGS.GUILDS,
-				Intents.FLAGS.GUILD_MESSAGES,
-				Intents.FLAGS.GUILD_VOICE_STATES,
-			],
-		});
+	constructor(options: ClientOptions) {
+		super(options);
 	}
 
-	start() {
+	async start() {
 		this.registerModules();
 		this.login(process.env.DISCORD_TOKEN);
 	}
@@ -49,31 +41,30 @@ export class ExtendedClient extends Client {
 
 	async registerModules() {
 		// Commands
-		const slashCommands: ApplicationCommandDataResolvable[] = [];
 		const commandFiles = await globPromise(
 			`${__dirname}/../commands/*{.ts,.js}`
 		);
 		commandFiles.forEach(async (filePath: string) => {
-			const command: CommandType = await this.importFile(filePath);
-			if (!command.name) return;
-
+			const command: ICommand = await this.importFile(filePath);
+			console.log(command);
+			if (!command?.name) return;
 			this.commands.set(command.name, command);
-			slashCommands.push(command);
-		});
 
-		// this.on('ready', () => {
-		this.registerCommands({
-			commands: slashCommands,
-			// guildId: process.env.DISCORD_GUILDID,
+			if (command?.aliases.length !== 0) {
+				command.aliases.forEach((alias) => {
+					this.aliases.set(alias, command);
+				});
+			}
 		});
-		// });
 
 		// Events
 		const eventFiles = await globPromise(`${__dirname}/../events/*{.ts,.js}`);
 
 		eventFiles.forEach(async (filePath: string) => {
-			const event: Event<keyof ClientEvents> = await this.importFile(filePath);
-			this.on(event.event, event.run);
+			const event: IEvent = await this.importFile(filePath);
+			this.events.set(event.name, event);
+
+			this.on(event.name, event.run.bind(null, this));
 		});
 	}
 }

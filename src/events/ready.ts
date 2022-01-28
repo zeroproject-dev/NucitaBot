@@ -1,5 +1,10 @@
-import { Event } from '../structures/Event';
+import { IEvent } from '../Interfaces/IEvent';
 
-export default new Event('ready', () => {
-	console.log(`Login`);
-});
+const event: IEvent = {
+	name: 'ready',
+	run: (client, args) => {
+		console.log(`${client.user.tag} is ready!`);
+	},
+};
+
+export default event;

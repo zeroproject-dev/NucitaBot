@@ -1,4 +1,5 @@
-import { Client, Message, VoiceChannel } from 'discord.js';
+import { ExtendedClient } from './../structures/Client';
+import { Message, VoiceChannel } from 'discord.js';
 import Gtts from 'gtts';
 import {
 	AudioPlayer,
@@ -14,6 +15,7 @@ import {
 } from 'microsoft-cognitiveservices-speech-sdk';
 import { PassThrough, Readable } from 'stream';
 import { createDiscordJSAdapter } from './adapter';
+import { client } from '..';
 
 interface TTSOptions {
 	lang?: string;
@@ -29,15 +31,15 @@ export class Tts {
 	text: string;
 	author: string;
 	voiceChannel: VoiceChannel;
-	client: Client;
+	client: ExtendedClient;
 	player: AudioPlayer;
 	connection: VoiceConnection;
 
 	constructor(message: Message) {
 		this.text = message.content.slice(1).trim();
-		this.author = `${message.author.username}#${message.author.discriminator}`;
+		this.author = message.author.tag;
 		this.voiceChannel = message.member.voice.channel as VoiceChannel;
-		this.client = message.client;
+		this.client = message.client as ExtendedClient;
 		this.player = createAudioPlayer();
 		this.connection = joinVoiceChannel({
 			channelId: this.voiceChannel.id,
@@ -92,6 +94,7 @@ export class Tts {
 	private playAudio(stream: string | Readable) {
 		const resource = createAudioResource(stream);
 		this.player.play(resource);
+		client.voiceConnection = this.connection;
 		this.connection.subscribe(this.player);
 	}
 }

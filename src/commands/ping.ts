@@ -1,23 +1,12 @@
-import { Command } from '../structures/Command';
+import { ICommand } from '../Interfaces/ICommand';
 
-export default new Command({
+const command: ICommand = {
 	name: 'ping',
-	description: 'Replies with pong',
-	run: async ({ interaction }) => {
-		interaction.followUp('pong!');
+	description: 'Ping the bot',
+	aliases: ['p'],
+	run: async (client, message, args) => {
+		await message.channel.send(`Pong! ${client.ws.ping}ms`);
 	},
-});
+};
 
-// module.exports = {
-// 	name: 'ping',
-// 	desc: 'commands test',
-// 	usage: 'ping',
-// 	aliases: [],
-// 	isPrivate: false,
-// 	guildOnly: false,
-// 	category: 'test',
-// 	isOwner: true,
-// 	run: async (client, message, args) => {
-// 		await message.channel.send('Pong!');
-// 	},
-// };
+export default command;
