@@ -1,4 +1,3 @@
-import { RegisterCommandsOptions } from '../Interfaces/IClient';
 import { Client, ClientOptions, Collection, Intents } from 'discord.js';
 import { glob } from 'glob';
 import { promisify } from 'util';
@@ -27,18 +26,6 @@ export class ExtendedClient extends Client {
 		return (await import(filePath))?.default;
 	}
 
-	async registerCommands({ commands, guildId }: RegisterCommandsOptions) {
-		if (guildId) {
-			this.guilds.cache.get(guildId)?.commands.set(commands);
-			console.log(
-				`Registered ${commands.length} commands for guild ${guildId}`
-			);
-		} else {
-			this.application?.commands.set(commands);
-			console.log(`Registering ${commands.length} global commands`);
-		}
-	}
-
 	async registerModules() {
 		// Commands
 		const commandFiles = await globPromise(
@@ -46,7 +33,7 @@ export class ExtendedClient extends Client {
 		);
 		commandFiles.forEach(async (filePath: string) => {
 			const command: ICommand = await this.importFile(filePath);
-			console.log(command);
+
 			if (!command?.name) return;
 			this.commands.set(command.name, command);
 
