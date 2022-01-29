@@ -12,12 +12,14 @@ jobs:
     environment: NucitaBotDeploy
     steps:
       - name: deploy bot
-        uses: appleboy/ssh-action@master
+        uses: fifsky/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
+          user: ${{ secrets.USERNAME }}
           key: ${{ secrets.NUCITA_KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
+          command: |
             cd NucitaBot
-            npm -v
+            git pull 
+            npm install
+            npm run build
+            pm2 restart NucitaBot
