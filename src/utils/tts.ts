@@ -35,8 +35,8 @@ export class Tts {
 	player: AudioPlayer;
 	connection: VoiceConnection;
 
-	constructor(message: Message) {
-		this.text = message.content.slice(1).trim();
+	constructor(message: Message, text?: string) {
+		this.text = text ?? message.content.slice(1).trim();
 		this.author = message.author.tag;
 		this.voiceChannel = message.member.voice.channel as VoiceChannel;
 		this.client = message.client as ExtendedClient;
@@ -48,7 +48,7 @@ export class Tts {
 		});
 	}
 
-	speak(provider: TTSProviders, options: TTSOptions) {
+	speak(provider: TTSProviders, options?: TTSOptions) {
 		if (this.text === '') return;
 
 		console.log(`[${this.author}] ${this.text}`);
@@ -60,7 +60,12 @@ export class Tts {
 		}
 	}
 
-	private speakAzure(options: TTSOptions) {
+	private speakAzure(
+		options: TTSOptions = {
+			lang: 'es-BO',
+			voice: 'es-BO-MarceloNeural',
+		}
+	) {
 		const speechConfig = SpeechConfig.fromSubscription(
 			process.env.AZURE_API_KEY_TTS,
 			process.env.AZURE_REGION_TTS
@@ -86,7 +91,7 @@ export class Tts {
 		);
 	}
 
-	private speakGtts(options: TTSOptions) {
+	private speakGtts(options: TTSOptions = { lang: 'es' }) {
 		const gtts = new Gtts(this.text, options.lang);
 		this.playAudio(gtts.stream());
 	}

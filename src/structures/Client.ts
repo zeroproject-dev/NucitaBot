@@ -1,4 +1,4 @@
-import { Client, ClientOptions, Collection, Intents } from 'discord.js';
+import { Client, ClientOptions, Collection } from 'discord.js';
 import { glob } from 'glob';
 import { promisify } from 'util';
 import { ICommand } from '../Interfaces/ICommand';

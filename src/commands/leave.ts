@@ -9,7 +9,11 @@ const command: ICommand = {
 			client.voiceConnection.destroy();
 			client.voiceConnection = null;
 		} else {
-			message.channel.send('El bot no esta en un canal de voz.');
+			message.reply('El bot no esta en un canal de voz.').then((msg) => {
+				setTimeout(() => {
+					msg.delete();
+				}, 3000);
+			});
 		}
 	},
 };

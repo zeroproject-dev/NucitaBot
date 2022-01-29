@@ -46,21 +46,37 @@ export class Together {
 					Activities[i].code
 				);
 
-				if (invite.error) return this.message.reply(invite.error);
+				if (invite.error) {
+					return this.message.reply(invite.error).then((msg) => {
+						setTimeout(() => {
+							msg.delete();
+						}, 1000);
+					});
+				}
 
-				return await this.message.channel.send({
-					embeds: [
-						{
-							title: 'Actividad ' + Activities[i].name,
-							description: Activities[i].description,
-							url: `https://discord.gg/${invite.code}`,
-						},
-					],
-				});
+				return await this.message.channel
+					.send({
+						embeds: [
+							{
+								title: 'Actividad ' + Activities[i].name,
+								description: Activities[i].description,
+								url: `https://discord.gg/${invite.code}`,
+							},
+						],
+					})
+					.then((msg) => {
+						setTimeout(() => {
+							msg.delete();
+						}, 10000);
+					});
 			}
 		}
 
-		return this.message.reply('No se encontro la actividad');
+		return this.message.reply('No se encontro la actividad').then((msg) => {
+			setTimeout(() => {
+				msg.delete();
+			}, 5000);
+		});
 	}
 
 	async getList(message: Message) {
@@ -71,28 +87,34 @@ export class Together {
 			aliases += activity.aliases.join(', ') + '\n';
 		});
 
-		await message.channel.send({
-			embeds: [
-				{
-					title: 'Lista de actividades',
-					author: {
-						iconURL: this.client.user.avatarURL(),
+		await message
+			.reply({
+				embeds: [
+					{
+						title: 'Lista de actividades',
+						author: {
+							iconURL: this.client.user.avatarURL(),
+						},
+						color: 10181046,
+						fields: [
+							{
+								name: 'Actividad: ',
+								value: activities,
+								inline: true,
+							},
+							{
+								name: 'Alias: ',
+								value: aliases,
+								inline: true,
+							},
+						],
 					},
-					color: 10181046,
-					fields: [
-						{
-							name: 'Actividad: ',
-							value: activities,
-							inline: true,
-						},
-						{
-							name: 'Alias: ',
-							value: aliases,
-							inline: true,
-						},
-					],
-				},
-			],
-		});
+				],
+			})
+			.then((msg) => {
+				setTimeout(() => {
+					msg.delete();
+				}, 10000);
+			});
 	}
 }

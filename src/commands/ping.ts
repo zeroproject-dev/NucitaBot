@@ -5,7 +5,11 @@ const command: ICommand = {
 	description: 'Ping the bot',
 	aliases: ['p'],
 	run: async (client, message, args) => {
-		await message.channel.send(`Pong! ${client.ws.ping}ms`);
+		await message.reply(`Pong! ${client.ws.ping}ms`).then((msg) => {
+			setTimeout(() => {
+				msg.delete();
+			}, 3000);
+		});
 	},
 };
 

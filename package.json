@@ -11,6 +11,7 @@
 		"opusscript": "^0.0.8"
 	},
 	"name": "nucitabot",
+	"private": "true",
 	"description": "Bot for Nucita discord server",
 	"version": "1.0.0",
 	"main": "src/index.ts",

@@ -29,13 +29,10 @@ const event: IEvent = {
 				if (command) (command as ICommand).run(client, message, args);
 				break;
 			case process.env.VOICE_FEMALE_PREFIX:
-				tts?.speak(TTSProviders.gtts, { lang: 'es' });
+				tts?.speak(TTSProviders.gtts);
 				break;
 			case process.env.VOICE_MALE_PREFIX:
-				tts?.speak(TTSProviders.azure, {
-					lang: 'es-BO',
-					voice: 'es-BO-MarceloNeural',
-				});
+				tts?.speak(TTSProviders.azure);
 				break;
 			default:
 				return;

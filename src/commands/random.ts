@@ -7,18 +7,28 @@ const command: ICommand = {
 	run: async (client, message, args) => {
 		let random = Math.floor(Math.random() * args.length);
 		if (args.length === 0)
-			return message.channel.send('Debes ingresar al menos una opción');
+			return message.reply('Debes ingresar al menos una opción').then((msg) => {
+				setTimeout(() => {
+					msg.delete();
+				}, 5000);
+			});
 
-		message.channel.send({
-			embeds: [
-				{
-					title: 'Ganador',
-					type: 'rich',
-					description: args[random],
-					color: 10181046,
-				},
-			],
-		});
+		message
+			.reply({
+				embeds: [
+					{
+						title: 'Ganador',
+						type: 'rich',
+						description: args[random],
+						color: 10181046,
+					},
+				],
+			})
+			.then((msg) => {
+				setTimeout(() => {
+					msg.delete();
+				}, 10000);
+			});
 	},
 };
 
