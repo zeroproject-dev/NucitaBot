@@ -20,7 +20,4 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd NucitaBot
-            git pull 
-            npm install
-            npm run build
-            pm2 restart NucitaBot
+            npm -v
