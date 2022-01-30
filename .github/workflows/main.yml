@@ -13,13 +13,9 @@ jobs:
     steps:
       - name: deploy bot
         uses: fifsky/ssh-action@master
+        environments: NucitaBotDeploy
         with:
           host: ${{ secrets.HOST }}
           user: ${{ secrets.USERNAME }}
           key: ${{ secrets.NUCITA_KEY }}
-          command: |
-            cd NucitaBot
-            git pull 
-            npm install
-            npm run build
-            pm2 restart NucitaBot
+          command: ${{ secrets.HOST }}
