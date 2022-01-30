@@ -20,6 +20,7 @@ jobs:
           command: |
             export PATH=$HOME/.nvm/versions/node/v17.4.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
             cd NucitaBot
+            git pull
             npm i
             npm build
             pm2 restart NucitaBot
