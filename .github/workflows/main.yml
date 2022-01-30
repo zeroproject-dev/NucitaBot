@@ -17,4 +17,10 @@ jobs:
           host: ${{ secrets.HOST }}
           user: ${{ secrets.USERNAME }}
           key: ${{ secrets.NUCITA_KEY }}
-          command: ${{ secrets.HOST }}
+          command: |
+            export PATH=$HOME/.nvm/versions/node/v17.4.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+            cd NucitaBot
+            npm i
+            npm build
+            pm2 restart NucitaBot
+            pm2 list
