@@ -6,14 +6,13 @@ on:
       - main
 
 jobs:
-  job_one:
+  deployment:
     name: Deploy
     runs-on: ubuntu-latest
     environment: NucitaBotDeploy
     steps:
       - name: deploy bot
         uses: fifsky/ssh-action@master
-        environments: NucitaBotDeploy
         with:
           host: ${{ secrets.HOST }}
           user: ${{ secrets.USERNAME }}
