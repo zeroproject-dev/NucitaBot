@@ -22,6 +22,6 @@ jobs:
             cd NucitaBot
             git pull
             npm i
-            npm build
+            npm run build
             pm2 restart NucitaBot
             pm2 list
