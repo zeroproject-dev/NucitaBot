@@ -3,7 +3,7 @@ import { Tts, TTSProviders } from './../utils/tts';
 
 export class Timer {
 	message: Message;
-	timer: NodeJS.Timer = null;
+	static timer: NodeJS.Timer = null;
 	time: number;
 	types = {
 		s: (time: number) => {
@@ -30,8 +30,8 @@ export class Timer {
 				.reply('El tiempo no puede ser mayor a 8 horas')
 				.then((m) => setTimeout(m.delete.bind(m), 5000));
 
-		this.timer = setInterval(() => {
-			console.log('Time Left: ' + this.time);
+		Timer.timer = setInterval(() => {
+			console.log('Time Left: ' + this.time + 's');
 			this.time--;
 			if (this.time < 0) {
 				if (this.message.member.voice?.channelId)
@@ -42,34 +42,64 @@ export class Timer {
 		}, 1000);
 	}
 
-	async start(type: string, time: number) {
-		if (time > 8 && type === 'h')
+	async start(time: string) {
+		if (Timer.timer !== null)
 			return this.message
-				.reply('El tiempo no puede ser mayor a 8 horas')
+				.reply('Ya hay un temporizador activo')
 				.then((m) => setTimeout(m.delete.bind(m), 5000));
 
-		if (this.types[type] === undefined)
+		let parsedTime = NaN,
+			type = '';
+		if (time.includes(':')) {
+			[parsedTime, type] = this._parseTime(time);
+			if (parsedTime > 28800)
+				return this.message
+					.reply('El tiempo no puede ser mayor a 8 horas')
+					.then((m) => setTimeout(m.delete.bind(m), 5000));
+		} else {
+			type = time.at(-1).toLowerCase();
+			if (!Object.keys(this.types).includes(type))
+				return this.message
+					.reply('Formato de tiempo invalido')
+					.then((m) => setTimeout(m.delete.bind(m), 5000));
+			parsedTime = parseInt(time.slice(0, -1));
+		}
+
+		if (isNaN(parsedTime))
 			return this.message
-				.reply('Tipo Invalido')
+				.reply('Ingrese un número válido')
 				.then((m) => setTimeout(m.delete.bind(m), 5000));
 
-		this.types[type](time);
+		this.message
+			.reply(`Temporizador iniciado a ${time}`)
+			.then((m) => setTimeout(m.delete.bind(m), 5000));
+
+		this.types[type](parsedTime);
 	}
 
 	async stop() {
-		if (this.timer === null)
+		if (Timer.timer === null)
 			return this.message
 				.reply('No hay ningun temporizador activo')
 				.then((m) => setTimeout(m.delete.bind(m), 5000));
 
-		clearInterval(this.timer);
-		this.timer = null;
-		return this.time > 0
-			? this.message.channel
-					.send(`Temporizador detenido`)
-					.then((m) => setTimeout(m.delete.bind(m), 5000))
-			: this.message.channel
-					.send('El tiempo ha finalizado')
-					.then((m) => setTimeout(m.delete.bind(m), 5000));
+		clearInterval(Timer.timer);
+		Timer.timer = null;
+		return this.message.channel
+			.send('Temporizador finalizado')
+			.then((m) => setTimeout(m.delete.bind(m), 5000));
+	}
+
+	private _parseTime(time: string): [number, string] {
+		let totalTime: [number, string] = [NaN, ''];
+
+		let arrTime = time.split(':');
+
+		if (arrTime.length === 2) {
+			let timeSeconds = parseInt(arrTime[0]) * 3600 + parseInt(arrTime[1]) * 60;
+			totalTime = [timeSeconds, 's'];
+		}
+
+		return totalTime;
 	}
 }

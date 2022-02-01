@@ -6,21 +6,18 @@ const time: ICommand = {
 	aliases: ['time', 'ti'],
 	description: 'set the time to notify',
 	run: async (client, message, args) => {
+		if (args.length < 1)
+			return message
+				.reply('Debes especificar un tiempo')
+				.then((m) => setTimeout(m.delete.bind(m), 5000));
+
 		const timer = new Timer(message);
 		if (args[0].toLowerCase() === 'stop') {
 			timer.stop();
 			return;
 		}
 
-		const type = args[0].at(-1).toLowerCase();
-		const time = parseInt(args[0].slice(0, -1));
-
-		if (isNaN(time))
-			return message
-				.reply('Ingrese un número válido')
-				.then((m) => setTimeout(m.delete.bind(m), 5000));
-
-		timer.start(type, time);
+		timer.start(args[0].trim());
 	},
 };
 
