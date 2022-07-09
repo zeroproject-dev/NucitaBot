@@ -14,6 +14,7 @@ jobs:
       - name: deploy bot
         uses: fifsky/ssh-action@master
         with:
+          args: '-tt'
           host: ${{ secrets.HOST }}
           user: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
