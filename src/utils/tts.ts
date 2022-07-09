@@ -78,6 +78,7 @@ export class Tts {
 		synthesizer.speakTextAsync(
 			this.text,
 			(result) => {
+				console.log(result);
 				const { audioData } = result;
 				synthesizer.close();
 				const bufferStream = new PassThrough();
