@@ -1,6 +1,6 @@
 version: '3.7'
 services:
   nucitabot:
-    image: test_bot
+    image: nucta_bot
     env_file:
       - .env
