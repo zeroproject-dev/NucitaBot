@@ -1,13 +1,13 @@
 {
 	"dependencies": {
-		"@discordjs/voice": "^0.10.0",
-		"discord.js": "^13.8.1",
-		"dotenv": "^16.0.1",
-		"ffmpeg-static": "^5.0.2",
-		"glob": "^8.0.3",
+		"@discordjs/voice": "^0.11.0",
+		"discord.js": "^14.3.0",
+		"dotenv": "^16.0.2",
+		"ffmpeg-static": "^5.1.0",
 		"gtts": "^0.2.1",
 		"libsodium-wrappers": "^0.7.10",
-		"microsoft-cognitiveservices-speech-sdk": "^1.22.0",
+		"microsoft-cognitiveservices-speech-sdk": "^1.23.0",
+		"node-fetch": "^2.6.7",
 		"opusscript": "^0.0.8"
 	},
 	"name": "nucitabot",
@@ -26,12 +26,11 @@
 	"author": "zeroproject (Andres Copeticona)",
 	"license": "ISC",
 	"devDependencies": {
-		"@types/glob": "^7.2.0",
-		"@types/node": "^18.0.3",
+		"@types/node": "^18.7.18",
 		"eslint": "^8.19.0",
 		"nodemon": "^2.0.19",
-		"ts-node": "^10.8.2",
+		"ts-node": "^10.9.1",
 		"ts-node-dev": "^2.0.0",
-		"typescript": "^4.7.4"
+		"typescript": "^4.8.3"
 	}
 }
