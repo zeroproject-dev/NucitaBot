@@ -2,14 +2,13 @@ import { Client, ClientOptions, Collection } from 'discord.js';
 import { readdir } from 'fs/promises';
 import { ICommand } from '../Interfaces/ICommand';
 import { IEvent } from '../Interfaces/IEvent';
-import { VoiceConnection } from '@discordjs/voice';
 import path from 'path';
 
 export class ExtendedClient extends Client {
 	commands: Collection<string, ICommand> = new Collection();
 	events: Collection<string, IEvent> = new Collection();
 	aliases: Collection<string, ICommand> = new Collection();
-	voiceConnection: VoiceConnection;
+	voiceConnection;
 
 	constructor(options: ClientOptions) {
 		super(options);
@@ -18,9 +17,6 @@ export class ExtendedClient extends Client {
 	async start() {
 		this.registerModules();
 		this.login(process.env.DISCORD_TOKEN);
-		console.log(process.env.COMMAND_PREFIX);
-		console.log(process.env.VOICE_FEMALE_PREFIX);
-		console.log(process.env.VOICE_MALE_PREFIX);
 	}
 
 	async importFile(filePath: string) {
