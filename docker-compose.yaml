@@ -1,6 +1,7 @@
-version: '3.7'
+version: '3.9'
 services:
   nucitabot:
-    image: nucita_bot
+    build: .
+    container_name: nucitabot
     env_file:
       - .env
