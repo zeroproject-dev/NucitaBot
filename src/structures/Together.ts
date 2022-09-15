@@ -93,7 +93,8 @@ export class Together {
 					{
 						title: 'Lista de actividades',
 						author: {
-							iconURL: this.client.user.avatarURL(),
+							name: message.author.username,
+							icon_url: this.client.user.avatarURL(),
 						},
 						color: 10181046,
 						fields: [

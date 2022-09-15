@@ -1,12 +1,54 @@
-import { VoiceChannel, Snowflake, Client, Constants, Guild } from 'discord.js';
 import {
+	Snowflake,
+	Client,
+	Guild,
+	VoiceBasedChannel,
+	Status,
+	Events,
+} from 'discord.js';
+import {
+	GatewayDispatchEvents,
 	GatewayVoiceServerUpdateDispatchData,
 	GatewayVoiceStateUpdateDispatchData,
-} from 'discord-api-types/v9';
-import {
-	DiscordGatewayAdapterCreator,
-	DiscordGatewayAdapterLibraryMethods,
-} from '@discordjs/voice';
+} from 'discord-api-types/v10';
+
+export interface DiscordGatewayAdapterLibraryMethods {
+	/**
+	 * Call this when the adapter can no longer be used (e.g. due to a disconnect from the main gateway)
+	 */
+	destroy(): void;
+	/**
+	 * Call this when you receive a VOICE_SERVER_UPDATE payload that is relevant to the adapter.
+	 *
+	 * @param data - The inner data of the VOICE_SERVER_UPDATE payload
+	 */
+	onVoiceServerUpdate(data: GatewayVoiceServerUpdateDispatchData): void;
+	/**
+	 * Call this when you receive a VOICE_STATE_UPDATE payload that is relevant to the adapter.
+	 *
+	 * @param data - The inner data of the VOICE_STATE_UPDATE payload
+	 */
+	onVoiceStateUpdate(data: GatewayVoiceStateUpdateDispatchData): void;
+}
+
+export interface DiscordGatewayAdapterImplementerMethods {
+	/**
+	 * This will be called by \@discordjs/voice when the adapter can safely be destroyed as it will no
+	 * longer be used.
+	 */
+	destroy(): void;
+	/**
+	 * Implement this method such that the given payload is sent to the main Discord gateway connection.
+	 *
+	 * @param payload - The payload to send to the main Discord gateway connection
+	 * @returns `false` if the payload definitely failed to send - in this case, the voice connection disconnects
+	 */
+	sendPayload(payload: any): boolean;
+}
+
+type DiscordGatewayAdapterCreator = (
+	methods: DiscordGatewayAdapterLibraryMethods
+) => DiscordGatewayAdapterImplementerMethods;
 
 const adapters = new Map<Snowflake, DiscordGatewayAdapterLibraryMethods>();
 const trackedClients = new Set<Client>();
@@ -20,13 +62,13 @@ function trackClient(client: Client) {
 	if (trackedClients.has(client)) return;
 	trackedClients.add(client);
 	client.ws.on(
-		Constants.WSEvents.VOICE_SERVER_UPDATE,
+		GatewayDispatchEvents.VoiceServerUpdate,
 		(payload: GatewayVoiceServerUpdateDispatchData) => {
 			adapters.get(payload.guild_id)?.onVoiceServerUpdate(payload);
 		}
 	);
 	client.ws.on(
-		Constants.WSEvents.VOICE_STATE_UPDATE,
+		GatewayDispatchEvents.VoiceStateUpdate,
 		(payload: GatewayVoiceStateUpdateDispatchData) => {
 			if (
 				payload.guild_id &&
@@ -37,14 +79,14 @@ function trackClient(client: Client) {
 			}
 		}
 	);
-	client.on(Constants.Events.SHARD_DISCONNECT, (_, shardID) => {
-		const guilds = trackedShards.get(shardID);
+	client.on(Events.ShardDisconnect, (_, shardId) => {
+		const guilds = trackedShards.get(shardId);
 		if (guilds) {
 			for (const guildID of guilds.values()) {
 				adapters.get(guildID)?.destroy();
 			}
 		}
-		trackedShards.delete(shardID);
+		trackedShards.delete(shardId);
 	});
 }
 
@@ -65,7 +107,7 @@ function trackGuild(guild: Guild) {
  * @param channel - The channel to create the adapter for
  */
 export function createDiscordJSAdapter(
-	channel: VoiceChannel
+	channel: VoiceBasedChannel
 ): DiscordGatewayAdapterCreator {
 	return (methods) => {
 		adapters.set(channel.guild.id, methods);
@@ -73,7 +115,7 @@ export function createDiscordJSAdapter(
 		trackGuild(channel.guild);
 		return {
 			sendPayload(data) {
-				if (channel.guild.shard.status === Constants.Status.READY) {
+				if (channel.guild.shard.status === Status.Ready) {
 					channel.guild.shard.send(data);
 					return true;
 				}

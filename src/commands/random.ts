@@ -18,7 +18,6 @@ const command: ICommand = {
 				embeds: [
 					{
 						title: 'Ganador',
-						type: 'rich',
 						description: args[random],
 						color: 10181046,
 					},
