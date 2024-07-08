@@ -1,70 +1,73 @@
-import { Client, ClientOptions, Collection } from 'discord.js';
-import { readdir } from 'fs/promises';
-import { ICommand } from '../Interfaces/ICommand';
-import { IEvent } from '../Interfaces/IEvent';
-import path from 'path';
+import { Client, ClientOptions, Collection } from "discord.js";
+import { readdir } from "fs/promises";
+import { ICommand } from "../Interfaces/ICommand";
+import { IEvent } from "../Interfaces/IEvent";
+import path from "path";
+import { ConsoleLogger } from "../utils/logger";
 
 export class ExtendedClient extends Client {
-	commands: Collection<string, ICommand> = new Collection();
-	events: Collection<string, IEvent> = new Collection();
-	aliases: Collection<string, ICommand> = new Collection();
-	voiceConnection;
+  commands: Collection<string, ICommand> = new Collection();
+  events: Collection<string, IEvent> = new Collection();
+  aliases: Collection<string, ICommand> = new Collection();
+  voiceConnection: any;
 
-	constructor(options: ClientOptions) {
-		super(options);
-	}
+  logger: ConsoleLogger = new ConsoleLogger("NucitaBot", false);
 
-	async start() {
-		this.registerModules();
-		this.login(process.env.DISCORD_TOKEN);
-	}
+  constructor(options: ClientOptions) {
+    super(options);
+  }
 
-	async importFile(filePath: string) {
-		return (await import(filePath))?.default;
-	}
+  async start() {
+    this.registerModules();
+    this.login(process.env.DISCORD_TOKEN);
+  }
 
-	async getFilesList(folder: string): Promise<string[]> {
-		let files = await readdir(folder);
+  async importFile(filePath: string) {
+    return (await import(filePath))?.default;
+  }
 
-		if (!folder.endsWith('/')) folder += '/';
+  async getFilesList(folder: string): Promise<string[]> {
+    let files = await readdir(folder);
 
-		let result = files.map((file) => path.join(folder, file));
+    if (!folder.endsWith("/")) folder += "/";
 
-		return result;
-	}
+    let result = files.map((file) => path.join(folder, file));
 
-	async registerModules() {
-		// Commands
-		const commandFiles = await this.getFilesList(`${__dirname}/../commands/`);
+    return result;
+  }
 
-		console.log('\n[NucitaBot] Registering commands...');
+  async registerModules() {
+    // Commands
+    const commandFiles = await this.getFilesList(`${__dirname}/../commands/`);
 
-		commandFiles.forEach(async (filePath: string) => {
-			const command: ICommand = await this.importFile(filePath);
+    this.logger.log("Registering commands...\n", { before: "\n" });
 
-			if (!command?.name) return;
-			this.commands.set(command.name, command);
-			console.log(`Command ${command.name} loaded!`);
+    commandFiles.forEach(async (filePath: string) => {
+      const command: ICommand = await this.importFile(filePath);
 
-			if (command?.aliases.length !== 0) {
-				command.aliases.forEach((alias) => {
-					this.aliases.set(alias, command);
-				});
-			}
-		});
+      if (!command?.name) return;
+      this.commands.set(command.name, command);
+      this.logger.log(`Command ${command.name} loaded!`);
 
-		// Events
-		const eventFiles = await this.getFilesList(`${__dirname}/../events`);
+      if (command?.aliases.length !== 0) {
+        command.aliases.forEach((alias) => {
+          this.aliases.set(alias, command);
+        });
+      }
+    });
 
-		console.log('\n[NucitaBot] Registering events...');
+    // Events
+    const eventFiles = await this.getFilesList(`${__dirname}/../events`);
 
-		eventFiles.forEach(async (filePath: string) => {
-			const event: IEvent = await this.importFile(filePath);
-			this.events.set(event.name, event);
+    this.logger.log("Registering events...\n", { before: "\n" });
 
-			console.log(`Event ${event.name} loaded!`);
+    eventFiles.forEach(async (filePath: string) => {
+      const event: IEvent = await this.importFile(filePath);
+      this.events.set(event.name, event);
 
-			this.on(event.name, event.run.bind(null, this));
-		});
-	}
+      this.logger.log(`Event ${event.name} loaded!`);
+
+      this.on(event.name, event.run.bind(null, this));
+    });
+  }
 }
