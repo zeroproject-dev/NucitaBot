@@ -90,7 +90,7 @@ export class Timer {
 
     clearInterval(Timer.timer);
     Timer.timer = null;
-    return this.message.channel
+    return (this.message.channel as any)
       .send("Temporizador finalizado")
       .then((m: any) => setTimeout(m.delete.bind(m), 5000));
   }
